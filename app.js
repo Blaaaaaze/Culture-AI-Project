@@ -19,7 +19,7 @@ const illustrations = [
     }
   },
   {
-    "file": "2.jpg",
+    "file": "2.png",
     "description": "Саша выбирает чипсы с необычными вкусами",
     "start": {
       "track": 1,
@@ -35,7 +35,7 @@ const illustrations = [
     }
   },
   {
-    "file": "4.jpg",
+    "file": "4.png",
     "description": "Новый ценник: 239 рублей вместо 179",
     "start": {
       "track": 1,
@@ -46,7 +46,7 @@ const illustrations = [
     "file": "5.png",
     "description": "Саша и Галина обсуждают подорожание чипсов",
     "start": {
-      "track": 4,
+      "track": 2,
       "fraction": 0
     }
   },
@@ -210,7 +210,6 @@ async function resumeAudio() {
   try {
     await audio.play();
     if (token !== generation || !active) return;
-    $('loading').hidden = true;
   } catch {
     if (token === generation && active) stop('Не удалось запустить аудио. Проверьте соединение и попробуйте ещё раз.');
   }
@@ -222,7 +221,6 @@ function playTrack(index) {
   current = index;
   updateScene(index);
   $('chapter').textContent = `Фрагмент ${index + 1} из ${tracks.length}`;
-  $('loading').hidden = paused;
   audio.src = `static/audio/${tracks[index]}.mp3`;
   $('progress-fill').style.width = `${index / tracks.length * 100}%`;
   document.querySelector('.progress').setAttribute('aria-valuenow', Math.round(index / tracks.length * 100));
@@ -252,7 +250,6 @@ $('toggle-audio').addEventListener('click', () => {
     generation++;
     paused = true;
     audio.pause();
-    $('loading').hidden = true;
     updateControls();
   }
 });
@@ -264,8 +261,6 @@ audio.addEventListener('ended', () => {
   else stop('История закончилась. Спасибо, что послушали!');
 });
 audio.addEventListener('timeupdate', updateProgress);
-audio.addEventListener('waiting', () => { if (active && !paused) $('loading').hidden = false; });
-audio.addEventListener('playing', () => { if (active) $('loading').hidden = true; });
 audio.addEventListener('error', () => { if (active && audio.error) stop(`Не удалось загрузить фрагмент ${current + 1}. Попробуйте запустить историю ещё раз.`); });
 $('read').addEventListener('click', () => {
   $('choice').hidden = true;

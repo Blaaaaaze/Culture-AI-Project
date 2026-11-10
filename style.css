@@ -392,15 +392,6 @@ dialog[open] {
     user-select: none
 }
 
-.loading {
-    position: absolute;
-    bottom: 35px;
-    background: #17231dee;
-    padding: 12px 20px;
-    border-radius: 5px;
-    font-size: 13px
-}
-
 .player-bottom {
     font-size: 11px;
     letter-spacing: 1px;
