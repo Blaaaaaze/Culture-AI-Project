@@ -1,11 +1,107 @@
 'use strict';
 const tracks = ['first','second','third','fourth','fifth','sixth','seventh','eighth','ninth','tenth','eleventh','twelfth','thirteenth'];
-const pictures = ["0.png","1.png","2.jpg","3.png","4.jpg","5.png","6.png","7.png","8.jpg","9.png","10.png","11.png"];
-const descriptions = ["Знакомьтесь, это Саша","Саша и рыжий кот с купюрой у магазина","Саша выбирает чипсы с необычными вкусами","Галина появляется у полки с новыми ценниками","Новый ценник: 239 рублей вместо 179","Саша и Галина обсуждают подорожание чипсов","Саша спешит за газировкой, пока цены не изменились","Саша с покупками у кассы Галины","Терминал сообщает: на счёте недостаточно средств","Саша и Галина видят ошибку оплаты","Уведомление о списании 499 рублей за подписку","Саша узнаёт о списании за подписку"];
-// Номер фрагмента с нуля + доля его длительности. Доли приблизительные.
-// Для точных привязок используются секунды внутри указанного фрагмента.
-// Картинка 9 следует за картинкой 8, но не раньше 14-й секунды.
-const sceneStarts = [0,0.48,1,1.7,1.85,4,{"track":7,"seconds":7},7.5,{"track":10,"seconds":13},{"track":10,"fraction":0.6,"minSeconds":14},11,12];
+// Единый список файлов, описаний и привязок к аудио. Номер track считается с нуля.
+const illustrations = [
+  {
+    "file": "0.png",
+    "description": "Знакомьтесь, это Саша",
+    "start": {
+      "track": 0,
+      "fraction": 0
+    }
+  },
+  {
+    "file": "1.png",
+    "description": "Саша и рыжий кот с купюрой у магазина",
+    "start": {
+      "track": 0,
+      "fraction": 0.48
+    }
+  },
+  {
+    "file": "2.jpg",
+    "description": "Саша выбирает чипсы с необычными вкусами",
+    "start": {
+      "track": 1,
+      "fraction": 0
+    }
+  },
+  {
+    "file": "3.png",
+    "description": "Галина появляется у полки с новыми ценниками",
+    "start": {
+      "track": 1,
+      "fraction": 0.7
+    }
+  },
+  {
+    "file": "4.jpg",
+    "description": "Новый ценник: 239 рублей вместо 179",
+    "start": {
+      "track": 1,
+      "fraction": 0.85
+    }
+  },
+  {
+    "file": "5.png",
+    "description": "Саша и Галина обсуждают подорожание чипсов",
+    "start": {
+      "track": 4,
+      "fraction": 0
+    }
+  },
+  {
+    "file": "6.png",
+    "description": "Саша спешит за газировкой, пока цены не изменились",
+    "start": {
+      "track": 7,
+      "seconds": 7
+    }
+  },
+  {
+    "file": "7.png",
+    "description": "Саша с покупками у кассы Галины",
+    "start": {
+      "track": 7,
+      "fraction": 0.5
+    }
+  },
+  {
+    "file": "8.jpg",
+    "description": "Терминал сообщает: на счёте недостаточно средств",
+    "start": {
+      "track": 10,
+      "seconds": 13
+    }
+  },
+  {
+    "file": "9.png",
+    "description": "Саша и Галина видят ошибку оплаты",
+    "start": {
+      "track": 10,
+      "fraction": 0.6,
+      "minSeconds": 14
+    }
+  },
+  {
+    "file": "10.png",
+    "description": "Уведомление о списании 499 рублей за подписку",
+    "start": {
+      "track": 11,
+      "fraction": 0
+    }
+  },
+  {
+    "file": "11.png",
+    "description": "Саша узнаёт о списании за подписку",
+    "start": {
+      "track": 12,
+      "fraction": 0
+    }
+  }
+];
+const pictures = illustrations.map(image => image.file);
+const descriptions = illustrations.map(image => image.description);
 const pictureCount = String(pictures.length).padStart(2,'0');
 const $ = id => document.getElementById(id);
 $('illustration-count').textContent = pictures.length + ' иллюстраций';
@@ -31,14 +127,16 @@ window.STORY.forEach(block => {
   }
   paragraph.append(document.createTextNode(block.text));
   $('story').append(paragraph);
-  if (Number.isInteger(block.image)) {
+  if (typeof block.image === 'string') {
+    const imageIndex = pictures.indexOf(block.image);
+    if (imageIndex < 0) throw new Error('Неизвестная иллюстрация: ' + block.image);
     const figure = document.createElement('figure');
     const img = document.createElement('img');
-    img.src = `static/image/${pictures[block.image]}`;
-    img.alt = descriptions[block.image];
+    img.src = `static/image/${block.image}`;
+    img.alt = descriptions[imageIndex];
     img.loading = 'lazy';
     const caption = document.createElement('figcaption');
-    caption.textContent = `${String(block.image + 1).padStart(2,'0')} / ${pictureCount} — ${descriptions[block.image]}`;
+    caption.textContent = `Иллюстрация ${block.image.replace(/\.[^.]+$/, '')} — ${descriptions[imageIndex]}`;
     figure.append(img, caption);
     $('story').append(figure);
   }
@@ -55,14 +153,14 @@ function showChoice() {
   $('choice').hidden = false;
   window.scrollTo(0,0);
 }
-function updateScene(position, seconds = 0) {
-  const scene = sceneStarts.reduce((last, start, i) => {
-    if (typeof start === 'number') return position >= start ? i : last;
-    const track = Math.floor(position);
-    const threshold = start.seconds ?? Math.max(start.minSeconds, (Number.isFinite(audio.duration) ? audio.duration : Infinity) * start.fraction);
+function updateScene(track, seconds = 0, duration = 0) {
+  const scene = illustrations.reduce((last, image, i) => {
+    const start = image.start;
+    const threshold = start.seconds ?? Math.max(start.minSeconds ?? 0,
+      start.fraction === 0 ? 0 : (Number.isFinite(duration) && duration > 0 ? duration * start.fraction : Infinity));
     return track > start.track || (track === start.track && seconds >= threshold) ? i : last;
   }, 0);
-  const src = `static/image/${pictures[scene]}`;
+  const src = 'static/image/' + pictures[scene];
   if ($('slide').getAttribute('src') !== src) {
     $('slide').src = src;
     $('slide').alt = descriptions[scene];
@@ -70,7 +168,7 @@ function updateScene(position, seconds = 0) {
 }
 function updateProgress() {
   const fraction = Number.isFinite(audio.duration) && audio.duration > 0 ? audio.currentTime / audio.duration : 0;
-  if (active) updateScene(current + fraction, audio.currentTime);
+  if (active) updateScene(current, audio.currentTime, audio.duration);
   const value = (current + fraction) / tracks.length * 100;
   $('progress-fill').style.width = `${value}%`;
   document.querySelector('.progress').setAttribute('aria-valuenow', Math.round(value));
