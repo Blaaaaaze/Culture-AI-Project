@@ -87,15 +87,15 @@ const illustrations = [
     "file": "10.png",
     "description": "Уведомление о списании 499 рублей за подписку",
     "start": {
-      "track": 11,
-      "fraction": 0
+      "track": 10,
+      "seconds": 17
     }
   },
   {
     "file": "11.png",
     "description": "Саша узнаёт о списании за подписку",
     "start": {
-      "track": 12,
+      "track": 11,
       "fraction": 0
     }
   }
