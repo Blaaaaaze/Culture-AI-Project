@@ -662,9 +662,9 @@ body.listening {
 @media(max-width:800px){#story img{max-height:75svh}}
 
 .audio-controls{display:flex;justify-content:center;align-items:center;gap:10px}
-.audio-controls button{min-height:40px;padding:8px 15px;border:1px solid #ffffff50;border-radius:24px;background:transparent;color:#f4efe5;font-size:12px}
+.audio-controls button{width:42px;height:42px;min-height:42px;display:grid;place-items:center;padding:8px;border:1px solid #ffffff50;border-radius:24px;background:transparent;color:#f4efe5;font-size:18px}
 .audio-controls button:hover:not(:disabled){background:#ffffff15}
 .audio-controls button:disabled{opacity:.3;cursor:default}
-.audio-controls #toggle-audio{min-width:135px;background:#f4efe5;color:#17231d}
+.audio-controls #toggle-audio{min-width:42px;background:#f4efe5;color:#17231d}
 .is-paused .on-air i{animation:none;opacity:.4}
-@media(max-width:480px){.audio-controls{gap:6px}.audio-controls button{padding:8px 10px;font-size:11px}.audio-controls #toggle-audio{min-width:110px}}
+@media(max-width:480px){.audio-controls{gap:6px}.audio-controls button{padding:8px;font-size:18px}.audio-controls #toggle-audio{min-width:42px}}

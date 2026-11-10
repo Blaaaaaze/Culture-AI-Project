@@ -5,7 +5,7 @@ const descriptions = ['Знакомьтесь, это Саша','Саша и р�
 // Номер фрагмента с нуля + доля его длительности. Доли приблизительные.
 // Для точных привязок используются секунды внутри указанного фрагмента.
 // Картинка 10 следует за картинкой 9, но не раньше 14-й секунды.
-const sceneStarts = [0,0.48,1,1.7,1.85,2,4,7,7.5,
+const sceneStarts = [0,0.48,1,1.7,1.85,2,4,{track:7,seconds:7},7.5,
   {track:10,seconds:13}, {track:10,fraction:0.6,minSeconds:14},11,12];
 const pictureCount = String(pictures.length).padStart(2,'0');
 const $ = id => document.getElementById(id);
@@ -101,7 +101,7 @@ function stop(message) {
 function updateControls() {
   $('previous-track').disabled = current === 0;
   $('next-track').disabled = current === tracks.length - 1;
-  $('toggle-audio').textContent = paused ? '▶ Продолжить' : 'Ⅱ Пауза';
+  $('toggle-audio').textContent = paused ? '▶' : 'Ⅱ';
   $('toggle-audio').setAttribute('aria-label', paused ? 'Продолжить воспроизведение' : 'Приостановить воспроизведение');
   $('playback-status').textContent = paused ? 'На паузе' : 'История звучит';
   player.classList.toggle('is-paused', paused);
